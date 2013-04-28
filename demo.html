@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+    </head>
+    <body>
+        <nav class="skimr">
+            <ul>
+                <li>
+                    <a href="#en" data-language="en">English</a>
+                </li>
+                <li>
+                    <a href="#fr" data-language="fr">French</a>
+                </li>
+            </ul>
+        </nav>
+
+        <h1 data-translation="title">Hello!</h1>
+
+        <p data-translation="hello-world">Hello world! This is HTML5 Boilerplate.</p>
+
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="skimr.js"></script>
+        <script src="demo.js"></script>
+
+        <script>
+        (function(){
+    
+            var dictionaries = [];
+
+            dictionaries["fr"] = {
+                "title": "Bonjour!",
+                "hello-world": "Bonjour, monde! Ceci est HTML5 Boilerplate."
+            };
+
+            var skimr = new Skimr({
+                "dictionaries": dictionaries
+            });
+
+        })(jQuery);
+        </script>
+    </body>
+</html>
