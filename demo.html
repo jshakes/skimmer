@@ -19,6 +19,9 @@
                 <li>
                     <a href="#fr" data-language="fr">French</a>
                 </li>
+                <li>
+                    <a href="#de" data-language="de">German</a>
+                </li>
             </ul>
         </nav>
 
@@ -28,7 +31,6 @@
 
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
         <script src="skimr.js"></script>
-        <script src="demo.js"></script>
 
         <script>
         (function(){
@@ -39,6 +41,8 @@
                 "title": "Bonjour!",
                 "hello-world": "Bonjour, monde! Ceci est HTML5 Boilerplate."
             };
+
+            dictionaries["de"] = "json/de.json";
 
             var skimr = new Skimr({
                 "dictionaries": dictionaries

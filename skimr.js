@@ -1,12 +1,19 @@
+/*
+Todo: 
+    - Set up fixtures and JSON data handlers ✓
+    - Autogenerate language switcher(?)
+    - Detect hashchange(?)
+    - Write a readme
+*/
+
 function Skimr(properties){
 
     var defaults = {
 
-        default_lang: $("html").attr("lang") ? $("html").attr("lang") : "en",
+        default_lang: "en",
         dictionaries: [],
-        datasrc: "fixtures",
-        selements: $("[data-translation]")
-    }
+        elements: $("[data-translation]")
+    };
 
     Skimr.prototype._init = function(){
 
@@ -25,6 +32,7 @@ function Skimr(properties){
             })(i);
         }
 
+        this.fetch_dictionaries();
         this.create_default_dictionary();
         this.bind_events();
 
@@ -53,13 +61,36 @@ function Skimr(properties){
         });
     }
 
+    Skimr.prototype.fetch_dictionaries = function(){
+
+        var that = this;
+
+        for(var lang in this.dictionaries){
+
+            (function(lang){
+
+                if(typeof that.dictionaries[lang] == "string"){
+
+                    $.ajax({
+                        url: "json/de.json",
+                        dataType: "json",
+                        async: false,
+                        success: function(data, textStatus, jqXHR){
+                            that.dictionaries[lang] = data;
+                        }
+                    });
+                }
+            })(lang);
+        }
+    }
+
     Skimr.prototype.create_default_dictionary = function(){
 
         var that = this;
 
         this.dictionaries[this.default_lang] = {};
             
-        that.selements.each(function(){
+        that.elements.each(function(){
 
             var _key = $(this).data("translation");
             var _trans = $(this).html();
@@ -71,7 +102,7 @@ function Skimr(properties){
 
         var that = this;
 
-        this.selements.each(function(){
+        this.elements.each(function(){
 
             var _key = $(this).data("translation");
             _trans = that.dictionaries[lang][_key];
