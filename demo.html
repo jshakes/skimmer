@@ -29,6 +29,8 @@
 
         <p data-translation="hello-world">Hello world! This is HTML5 Boilerplate.</p>
 
+        <p data-translation="awesome">It is <span class="d">9</span> times more awesome than regular <span class="s">boilerplates</span>.</p>
+
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
         <script src="skimr.js"></script>
 
@@ -37,11 +39,14 @@
     
             var dictionaries = [];
 
+            //this dictionary is loaded using a hardcoded object
             dictionaries["fr"] = {
                 "title": "Bonjour!",
-                "hello-world": "Bonjour, monde! Ceci est HTML5 Boilerplate."
+                "hello-world": "Bonjour, monde! Ceci est HTML5 Boilerplate.",
+                "awesome": "Il est %d fois plus impressionnant que %s réguliers."
             };
 
+            //this dictionary is loadeed from a json file
             dictionaries["de"] = "json/de.json";
 
             var skimr = new Skimr({

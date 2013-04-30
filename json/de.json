@@ -1,4 +1,5 @@
 {
     "title": "Guten Tag!",
-    "hello-world": "Hallo welt! Das ist HTML5 Boilerplate."
+    "hello-world": "Hallo welt! Das ist HTML5 Boilerplate.",
+    "awesome": "Es ist %d mal mehr awesome als normale %s."
 }

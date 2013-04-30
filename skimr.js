@@ -4,6 +4,7 @@ Todo:
     - Autogenerate language switcher(?)
     - Detect hashchange(?)
     - Write a readme
+    - Include variables in translations ✓
 */
 
 function Skimr(properties){
@@ -11,6 +12,7 @@ function Skimr(properties){
     var defaults = {
 
         default_lang: "en",
+        active_lang: "en",
         dictionaries: [],
         elements: $("[data-translation]")
     };
@@ -67,7 +69,7 @@ function Skimr(properties){
 
         for(var lang in this.dictionaries){
 
-            (function(lang){
+            (function(){
 
                 if(typeof that.dictionaries[lang] == "string"){
 
@@ -98,15 +100,61 @@ function Skimr(properties){
         });
     }
 
+    Skimr.prototype.parse_variables = function(key){
+
+        var src_str = this.dictionaries[this.active_lang][key];
+        
+        if(src_str != undefined && src_str != ""){
+
+            $dest_vars_s = $("[data-translation=" + key + "] .s"); //strings
+            $dest_vars_d = $("[data-translation=" + key + "] .d"); //ints
+            
+            src_arr = src_str.split(/(%d|%s)/);
+
+            if(src_arr.length > 1){
+
+                var output_str = "";
+                var src_var_counter_s = src_var_counter_d = 0;
+
+                for(var i in src_arr){
+
+                    (function(){
+
+                        var part = "";
+
+                        if(src_arr[i] == "%s"){
+
+                            part = ($dest_vars_s[src_var_counter_s] != undefined) ? $dest_vars_s[src_var_counter_s++].outerHTML : src_arr[i];
+                        }
+                        else if(src_arr[i] == "%d"){
+
+                            part = ($dest_vars_d[src_var_counter_d] != undefined) ? $dest_vars_d[src_var_counter_d++].outerHTML : src_arr[i];
+                        }
+                        else{
+
+                            part = src_arr[i];
+                        }
+                        output_str += part;
+                    })(i);
+                }
+                return output_str;
+            }
+            else return src_str;
+        }
+        else return false;
+    }
+
     Skimr.prototype.translate_to_lang = function(lang){
 
         var that = this;
 
+        this.active_lang = lang;
+
         this.elements.each(function(){
 
             var _key = $(this).data("translation");
-            _trans = that.dictionaries[lang][_key];
-            if(_trans != undefined && _trans != ""){
+            _trans = that.parse_variables(_key);
+            if(_trans){
 
                 $(this).html(_trans);
             }
