@@ -5,16 +5,21 @@ Todo:
     - Detect hashchange(?)
     - Write a readme
     - Include variables in translations ✓
+    - Add animation
+    - Callback functions ✓
+    - Add args to callback functions
 */
 
 function Skimr(properties){
 
     var defaults = {
-
         default_lang: "en",
         active_lang: "en",
         dictionaries: [],
-        elements: $("[data-translation]")
+        elements: $("[data-translation]"),
+        fade: false,
+        onLoad: false,
+        onComplete: false
     };
 
     Skimr.prototype._init = function(){
@@ -37,12 +42,21 @@ function Skimr(properties){
         this.fetch_dictionaries();
         this.create_default_dictionary();
         this.bind_events();
+        this.trigger(this.onLoad);
 
         //check for language hash in the url
         var hash = window.location.hash.split("#")[1];
-        if(hash != undefined && this.dictionaries[hash] != undefined){
+        if(hash != undefined && hash != this.active_lang && this.dictionaries[hash] != undefined){
 
             this.translate_to_lang(hash);
+        }
+    }
+
+    Skimr.prototype.trigger = function(callback){
+
+        if($.isFunction(callback)){
+
+            callback.call();
         }
     }
 
@@ -69,7 +83,7 @@ function Skimr(properties){
 
         for(var lang in this.dictionaries){
 
-            (function(){
+            (function(lang){
 
                 if(typeof that.dictionaries[lang] == "string"){
 
@@ -96,6 +110,15 @@ function Skimr(properties){
 
             var _key = $(this).data("translation");
             var _trans = $(this).html();
+
+            //convert variable elements into conversion specifications
+            $(this).find(".s, .d").each(function(){
+
+                substr = $(this)[0].outerHTML;
+                newsubstr = $(this).hasClass("s") ? "%s" : "%d";
+                _trans = _trans.replace(substr, newsubstr);
+            });
+
             that.dictionaries[that.default_lang][_key] = _trans;
         });
     }
@@ -118,7 +141,7 @@ function Skimr(properties){
 
                 for(var i in src_arr){
 
-                    (function(){
+                    (function(i){
 
                         var part = "";
 
@@ -150,14 +173,25 @@ function Skimr(properties){
 
         this.active_lang = lang;
 
-        this.elements.each(function(){
+        $.each(this.elements, function(i, val){
 
             var _key = $(this).data("translation");
-            _trans = that.parse_variables(_key);
+            var _trans = that.parse_variables(_key);
             if(_trans){
 
-                $(this).html(_trans);
+                if(that.fade){
+
+                    $(this).fadeOut(100, function(){
+
+                        $(this).html(_trans).fadeIn(100);
+                    });
+                }
+                else $(this).html(_trans);                
             }
+        });
+
+        this.elements.promise().done(function(){
+            that.trigger(that.onComplete);
         });
     }
 

@@ -25,6 +25,8 @@
             </ul>
         </nav>
 
+        <a href="javscript:void(0)" id="hippos">boilerplates = hippos (string variable test)</a>
+
         <h1 data-translation="title">Hello!</h1>
 
         <p data-translation="hello-world">Hello world! This is HTML5 Boilerplate.</p>
@@ -50,7 +52,16 @@
             dictionaries["de"] = "json/de.json";
 
             var skimr = new Skimr({
-                "dictionaries": dictionaries
+                dictionaries: dictionaries,
+                fade: "fade",
+                onComplete: function(){   console.log("complete!")  }
+            });
+
+            $("#hippos").on("click", function(){
+
+                $(".s").each(function(){
+                    $(this).text($(this).text().replace("boilerplates", "hippos"))
+                })
             });
 
         })(jQuery);
