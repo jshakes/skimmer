@@ -2,25 +2,28 @@
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en_EN"> <!--<![endif]-->
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title></title>
+        <title>Skimr Demo</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
+        <style>
+        .bold{   font-weight: bold;   }
+        </style>
     </head>
     <body>
         <nav class="skimr">
             <ul>
                 <li>
-                    <a href="#en" data-language="en">English</a>
+                    <a href="#en_EN" data-language="en_EN">English</a>
                 </li>
                 <li>
-                    <a href="#fr" data-language="fr">French</a>
+                    <a href="#fr_FR" data-language="fr_FR">French</a>
                 </li>
                 <li>
-                    <a href="#de" data-language="de">German</a>
+                    <a href="#de_DE" data-language="de_DE">German</a>
                 </li>
             </ul>
         </nav>
@@ -42,25 +45,27 @@
             var dictionaries = [];
 
             //this dictionary is loaded using a hardcoded object
-            dictionaries["fr"] = {
+            dictionaries["fr_FR"] = {
                 "title": "Bonjour!",
                 "hello-world": "Bonjour, monde! Ceci est HTML5 Boilerplate.",
                 "awesome": "Il est %d fois plus impressionnant que %s réguliers."
             };
 
             //this dictionary is loadeed from a json file
-            dictionaries["de"] = "json/de.json";
+            dictionaries["de_DE"] = "json/de.json";
 
             var skimr = new Skimr({
                 dictionaries: dictionaries,
                 fade: "fade",
+                onLoad: function(){   console.log("loaded")  },
+                onStart: function(){   console.log("starting")  },
                 onComplete: function(){   console.log("complete!")  }
             });
 
             $("#hippos").on("click", function(){
 
                 $(".s").each(function(){
-                    $(this).text($(this).text().replace("boilerplates", "hippos"))
+                    $(this).text($(this).text().replace("boilerplates", "hippos")).addClass("bold");
                 })
             });
 

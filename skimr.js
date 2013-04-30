@@ -13,12 +13,15 @@ Todo:
 function Skimr(properties){
 
     var defaults = {
-        default_lang: "en",
-        active_lang: "en",
+        default_lang: "en_EN",
+        active_lang: "en_EN",
         dictionaries: [],
         elements: $("[data-translation]"),
+        str_class: "s",
+        int_class: "d",
         fade: false,
         onLoad: false,
+        onStart: false,
         onComplete: false
     };
 
@@ -108,18 +111,18 @@ function Skimr(properties){
             
         that.elements.each(function(){
 
-            var _key = $(this).data("translation");
-            var _trans = $(this).html();
+            var key = $(this).data("translation");
+            var trans = $(this).html();
 
             //convert variable elements into conversion specifications
-            $(this).find(".s, .d").each(function(){
+            $(this).find("." + that.str_class + ", ." + that.int_class).each(function(){
 
-                substr = $(this)[0].outerHTML;
-                newsubstr = $(this).hasClass("s") ? "%s" : "%d";
-                _trans = _trans.replace(substr, newsubstr);
+                var substr = $(this)[0].outerHTML;
+                var newsubstr = $(this).hasClass(that.str_class) ? "%s" : "%d";
+                trans = trans.replace(substr, newsubstr);
             });
 
-            that.dictionaries[that.default_lang][_key] = _trans;
+            that.dictionaries[that.default_lang][key] = trans;
         });
     }
 
@@ -129,8 +132,8 @@ function Skimr(properties){
         
         if(src_str != undefined && src_str != ""){
 
-            $dest_vars_s = $("[data-translation=" + key + "] .s"); //strings
-            $dest_vars_d = $("[data-translation=" + key + "] .d"); //ints
+            $dest_vars_s = $("[data-translation=" + key + "] ." + this.str_class); //strings
+            $dest_vars_d = $("[data-translation=" + key + "] ." + this.int_class); //ints
             
             src_arr = src_str.split(/(%d|%s)/);
 
@@ -170,6 +173,8 @@ function Skimr(properties){
     Skimr.prototype.translate_to_lang = function(lang){
 
         var that = this;
+        
+        this.trigger(this.onStart);
 
         this.active_lang = lang;
 
