@@ -63,6 +63,7 @@
                 on_complete: function(lang){   console.log("complete! Translated to "+ lang)  }
             });
 
+            //some test cases to mess with variables
             $("#hippos").on("click", function(){
 
                 $(".s").each(function(){
@@ -72,9 +73,8 @@
 
             $("#randomize").on("click", function(){
 
-
                 $(".d").each(function(){
-                    $(this).text(Math.floor(Math.random() * 100)).addClass("bold");
+                    $(this).text(Math.ceil(Math.random() * 100)).addClass("bold");
                 });
             });
 

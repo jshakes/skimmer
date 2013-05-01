@@ -39,38 +39,58 @@ function Skimr(properties){
 
                 that[i] = (properties[i] != undefined) ? properties[i] : defaults[i];
                 
+                //create getter and setter methods
                 that["get_" + i] = function(){
 
+                    return that[i];
+                }
+                that["set_" + i] = function(new_val){
+
+                    that[i] = new_val;
                     return that[i];
                 }
             })(i);
         }
 
-        this.active_lang = this.get_native_lang();
+        this.set_active_lang(this.get_native_lang());
         this.load_dictionaries();
         this.create_native_dictionary();
-        this.bind_events();
+        this.bind_events();       
 
-        //check for language hash in the url
-        
+        var hash = this.detect_valid_hash();
 
-        if((hash = window.location.hash.split("#")[1]) != undefined && hash != this.native_lang && this.dictionaries[hash] != undefined){
+        if(hash && hash != this.get_active_lang()){
 
             var lang = hash;
             this.translate_to_lang(lang);
         }
-        else if(this.default_lang && this.default_lang != this.native_lang){
+        else if(this.get_default_lang() && this.get_default_lang() != this.get_native_lang()){
 
             var lang = this.get_default_lang();
             this.translate_to_lang();   
         }
-        else if(this.detect_lang && navigator.language != undefined && navigator.language != this.native_lang){
+        else if(this.get_detect_lang() && navigator.language != undefined && navigator.language != this.get_native_lang()){
 
             this.translate_to_lang(navigator.language);
         }
 
-        this.trigger(this.on_load);
+        trigger(this.get_on_load());
 
+    }
+
+    Skimr.prototype.detect_valid_hash = function(){
+
+        var loc_arr = window.location.hash.split("#")
+        if(loc_arr.length > 1){
+
+            if(this.get_dictionaries()[loc_arr[1]] != undefined){
+
+                var hash = loc_arr[1];
+                return hash;
+            }
+            else return false;
+        }
+        else return false;
     }
 
     Skimr.prototype.bind_events = function(){
@@ -94,11 +114,11 @@ function Skimr(properties){
 
         var that = this;
 
-        for(var lang in this.dictionaries){
+        for(var lang in this.get_dictionaries()){
 
             (function(lang){
 
-                if(typeof that.dictionaries[lang] == "string"){
+                if(typeof that.get_dictionaries()[lang] == "string"){
 
                     $.ajax({
                         url: "json/de.json",
@@ -117,30 +137,34 @@ function Skimr(properties){
 
         var that = this;
 
-        this.dictionaries[this.native_lang] = {};
+        var native_lang = this.get_native_lang();
+        var native_dictionary = {};
             
-        that.elements.each(function(){
+        this.elements.each(function(){
 
             var key = $(this).data("translation");
             var trans = $(this).html();
 
             //convert variable elements into conversion specifications
-            $(this).find("." + that.str_class + ", ." + that.int_class).each(function(){
+            $(this).find("." + that.get_str_class() + ", ." + that.get_int_class()).each(function(){
 
                 var substr = $(this)[0].outerHTML;
                 var newsubstr = $(this).hasClass(that.str_class) ? "%s" : "%d";
                 trans = trans.replace(substr, newsubstr);
             });
 
-            that.dictionaries[that.native_lang][key] = trans;
+            native_dictionary[key] = trans;
         });
+        var dictionaries = this.get_dictionaries();
+        dictionaries[native_lang] = native_dictionary;
+        this.set_dictionaries(dictionaries);
     }
 
     Skimr.prototype.parse_variables = function(key){
 
-        var src_str = this.dictionaries[this.active_lang][key];
+        var src_str = this.fetch_translation(key);
         
-        if(src_str != undefined && src_str != ""){
+        if(src_str){
 
             $dest_vars_s = $("[data-translation=" + key + "] ." + this.str_class); //strings
             $dest_vars_d = $("[data-translation=" + key + "] ." + this.int_class); //ints
@@ -184,11 +208,11 @@ function Skimr(properties){
 
         var that = this;
         
-        this.trigger(this.on_start);
+        trigger(this.on_start);
 
-        this.active_lang = lang;
+        this.set_active_lang(lang);
 
-        $.each(this.elements, function(i, val){
+        $.each(this.get_elements(), function(i, val){
 
             var _key = $(this).data("translation");
             var _trans = that.parse_variables(_key);
@@ -206,21 +230,30 @@ function Skimr(properties){
         });
 
         this.elements.promise().done(function(){
-            that.trigger(that.on_complete);
+            
+            trigger(that.on_complete);
         });
     }
 
     Skimr.prototype.fetch_translation = function(key, lang){
 
-        var src_lang = lang != undefined ? lang : this.active_lang;
-        return this.dictionaries[src_lang][key]
+        var src_lang = lang != undefined ? lang : this.get_active_lang();
+        var trans = this.get_dictionaries()[src_lang][key];
+        if(trans != undefined && trans != "") return trans;
+        else return false;
     }
+    
+    /*
+    Private methods
+    */
+    
+    var that = this;
 
-    Skimr.prototype.trigger = function(callback){
+    trigger = function(callback){
 
         if($.isFunction(callback)){
 
-            callback.call(this, this.active_lang);
+            callback.call(that, that.get_active_lang());
         }
     }
 
