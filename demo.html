@@ -14,7 +14,7 @@
         </style>
     </head>
     <body>
-        <nav class="skimr">
+        <nav class="skimmer">
             <ul>
                 <li>
                     <a href="#en-US" data-language="en-US">English</a>
@@ -35,10 +35,10 @@
 
         <p data-translation="hello-world">Hello world! This is HTML5 Boilerplate.</p>
 
-        <p data-translation="awesome">It is <span class="d">9</span> times more awesome than regular <span class="s">boilerplates</span>.</p>
+        <p data-translation="awesome">It is <span class="s num">9</span> times more awesome than regular <span class="s boilerplate">boilerplates</span>.</p>
 
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-        <script src="skimr.js"></script>
+        <script src="skimmer.js"></script>
 
         <script>
         (function(){
@@ -49,13 +49,13 @@
             dictionaries["fr-FR"] = {
                 "title": "Bonjour!",
                 "hello-world": "Bonjour, monde! Ceci est HTML5 Boilerplate.",
-                "awesome": "Il est %d fois plus impressionnant que %s réguliers."
+                "awesome": "Il est %s fois plus impressionnant que %s réguliers."
             };
 
             //this dictionary is loadeed from a json file
             dictionaries["de-DE"] = "json/de.json";
 
-            var skimr = new Skimr({
+            var skimmer = new Skimmer({
                 dictionaries: dictionaries,
                 fade: true,
                 on_load: function(lang){   console.log("loaded page with " + lang)  },
@@ -66,16 +66,13 @@
             //some test cases to mess with variables
             $("#hippos").on("click", function(){
 
-                $(".s").each(function(){
-                    $(this).text($(this).text().replace("boilerplates", "hippos")).addClass("bold");
-                });
+                
+                $(".boilerplate").text($(".boilerplate").text().replace("boilerplates", "hippos")).addClass("bold");
             });
 
             $("#randomize").on("click", function(){
 
-                $(".d").each(function(){
-                    $(this).text(Math.ceil(Math.random() * 100)).addClass("bold");
-                });
+                $(".num").text(Math.ceil(Math.random() * 100)).addClass("bold");
             });
 
         })(jQuery);

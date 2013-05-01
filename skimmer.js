@@ -10,9 +10,10 @@ Todo:
     - Add args to callback functions ✓
     - Translator method (by key or by string) ✓
     - Use navigator object for default language detection ✓
+    - Write a string to string translation method (no keys)
 */
 
-function Skimr(properties){
+function Skimmer(properties){
 
     var defaults = {
         native_lang: "en-US",
@@ -20,8 +21,7 @@ function Skimr(properties){
         detect_lang: true,
         dictionaries: [],
         elements: $("[data-translation]"),
-        str_class: "s",
-        int_class: "d",
+        var_class: "s",
         fade: false,
         on_load: null,
         on_start: null,
@@ -29,7 +29,7 @@ function Skimr(properties){
         active_lang: null
     };
 
-    Skimr.prototype._init = function(){
+    Skimmer.prototype._init = function(){
 
         var that = this;
         
@@ -78,7 +78,7 @@ function Skimr(properties){
 
     }
 
-    Skimr.prototype.detect_valid_hash = function(){
+    Skimmer.prototype.detect_valid_hash = function(){
 
         var loc_arr = window.location.hash.split("#")
         if(loc_arr.length > 1){
@@ -93,13 +93,13 @@ function Skimr(properties){
         else return false;
     }
 
-    Skimr.prototype.bind_events = function(){
+    Skimmer.prototype.bind_events = function(){
 
         var that = this;
 
-        $("nav.skimr a[data-language]").on("click", function(e){
+        $("nav.skimmer a[data-language]").on("click", function(e){
 
-            var $current = $("nav.skimr a.current[data-language]");
+            var $current = $("nav.Skimmer a.current[data-language]");
             var lang_off = $current.data("language");
             var lang_on = $(this).data("language");
             $current.removeClass("current");
@@ -110,7 +110,7 @@ function Skimr(properties){
         });
     }
 
-    Skimr.prototype.load_dictionaries = function(){
+    Skimmer.prototype.load_dictionaries = function(){
 
         var that = this;
 
@@ -133,7 +133,7 @@ function Skimr(properties){
         }
     }
 
-    Skimr.prototype.create_native_dictionary = function(){
+    Skimmer.prototype.create_native_dictionary = function(){
 
         var that = this;
 
@@ -146,11 +146,10 @@ function Skimr(properties){
             var trans = $(this).html();
 
             //convert variable elements into conversion specifications
-            $(this).find("." + that.get_str_class() + ", ." + that.get_int_class()).each(function(){
+            $(this).find("." + that.get_var_class()).each(function(){
 
                 var substr = $(this)[0].outerHTML;
-                var newsubstr = $(this).hasClass(that.str_class) ? "%s" : "%d";
-                trans = trans.replace(substr, newsubstr);
+                trans = trans.replace(substr, "%s");
             });
 
             native_dictionary[key] = trans;
@@ -160,72 +159,78 @@ function Skimr(properties){
         this.set_dictionaries(dictionaries);
     }
 
-    Skimr.prototype.parse_variables = function(key){
+    Skimmer.prototype.parse_vars_to_string = function(src_string, variables){
+                    
+        src_string_arr = src_string.split(/(%d|%s)/);
 
-        var src_str = this.fetch_translation(key);
-        
-        if(src_str){
+        if(src_string_arr.length > 1){
 
-            $dest_vars_s = $("[data-translation=" + key + "] ." + this.str_class); //strings
-            $dest_vars_d = $("[data-translation=" + key + "] ." + this.int_class); //ints
-            
-            src_arr = src_str.split(/(%d|%s)/);
+            var output_str = "";
 
-            if(src_arr.length > 1){
+            for(var i in src_string_arr){
 
-                var output_str = "";
-                var src_var_counter_s = src_var_counter_d = 0;
+                (function(i){
 
-                for(var i in src_arr){
+                    var part = "";
+                    
+                    if(/(%d|%s)/.test(src_string_arr[i])){
+                        
+                        part = (variables.length) ? variables.shift() : src_arr[i];                       
+                    }
+                    else{
 
-                    (function(i){
+                        part = src_string_arr[i];
+                    }
 
-                        var part = "";
-
-                        if(src_arr[i] == "%s"){
-
-                            part = ($dest_vars_s[src_var_counter_s] != undefined) ? $dest_vars_s[src_var_counter_s++].outerHTML : src_arr[i];
-                        }
-                        else if(src_arr[i] == "%d"){
-
-                            part = ($dest_vars_d[src_var_counter_d] != undefined) ? $dest_vars_d[src_var_counter_d++].outerHTML : src_arr[i];
-                        }
-                        else{
-
-                            part = src_arr[i];
-                        }
-                        output_str += part;
-                    })(i);
-                }
-                return output_str;
+                    output_str += part;
+                })(i);
             }
-            else return src_str;
+            
+            return output_str;
         }
-        else return false;
+        else return src_string;
     }
 
-    Skimr.prototype.translate_to_lang = function(lang){
+    Skimmer.prototype.parse_element_vars_to_array = function($element){
+
+        var variables = [];
+        var $var_children = $element.find("." + this.get_var_class());
+        
+        $var_children.each(function(){
+
+            var variable = $(this)[0].outerHTML;
+            variables.push(variable);
+        });
+
+        if(variables.length > 0) return variables;
+        
+        else return null;
+    }
+
+    Skimmer.prototype.translate_to_lang = function(lang){
 
         var that = this;
         
         trigger(this.on_start);
-
+        
         this.set_active_lang(lang);
 
         $.each(this.get_elements(), function(i, val){
 
-            var _key = $(this).data("translation");
-            var _trans = that.parse_variables(_key);
-            if(_trans){
+            var key = $(this).data("translation");
+            var vars = that.parse_element_vars_to_array($(this));
+            var trans = that.fetch_translation(key, vars);
 
-                if(that.fade){
+            if(trans){
+
+                if(that.get_fade()){
 
                     $(this).fadeOut(100, function(){
 
-                        $(this).html(_trans).fadeIn(100);
+                        $(this).html(trans).fadeIn(100);
                     });
                 }
-                else $(this).html(_trans);                
+                else $(this).html(trans);                
             }
         });
 
@@ -235,18 +240,25 @@ function Skimr(properties){
         });
     }
 
-    Skimr.prototype.fetch_translation = function(key, lang){
+    Skimmer.prototype.fetch_translation = function(key, variables, lang){
 
         var src_lang = lang != undefined ? lang : this.get_active_lang();
         var trans = this.get_dictionaries()[src_lang][key];
-        if(trans != undefined && trans != "") return trans;
-        else return false;
+        if(trans != undefined && trans != ""){
+
+            if(variables != undefined && Array.isArray(variables)){
+
+                trans = this.parse_vars_to_string(trans, variables);
+            }
+            return trans;
+        }
+        else return null;
     }
     
     /*
     Private methods
     */
-    
+
     var that = this;
 
     trigger = function(callback){
