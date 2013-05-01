@@ -10,7 +10,7 @@ Todo:
     - Add args to callback functions ✓
     - Translator method (by key or by string) ✓
     - Use navigator object for default language detection ✓
-    - Write a string to string translation method (no keys)
+    - Write a string to string translation method (no keys) ✓
 */
 
 function Skimmer(properties){
@@ -83,7 +83,7 @@ function Skimmer(properties){
         var loc_arr = window.location.hash.split("#")
         if(loc_arr.length > 1){
 
-            if(this.get_dictionaries()[loc_arr[1]] != undefined){
+            if(this.dictionary_exists(loc_arr[1])){
 
                 var hash = loc_arr[1];
                 return hash;
@@ -253,6 +253,49 @@ function Skimmer(properties){
             return trans;
         }
         else return null;
+    }
+
+    Skimmer.prototype.fetch_translation_by_string = function(str, variables, dest_lang){
+
+        if(this.dictionary_exists(dest_lang)){
+
+            var that = this, dest_key;
+        
+            //find the key we want
+            for(var i in that.get_dictionaries()){
+
+                (function(i){
+
+                    for(var key in that.get_dictionaries()[i]){
+
+                        var trans = that.get_dictionaries()[i][key];
+                        if(trans == str){
+
+                            dest_key = key;
+                            break;
+                        }
+                    }
+
+                })(i);
+            }
+            if(dest_key != ""){
+
+                return this.fetch_translation(dest_key, variables, dest_lang);
+            }
+        }
+        else return null;
+    }
+
+    Skimmer.prototype.dictionary_exists = function(lang){
+
+        if(this.get_dictionaries()[lang] != undefined && typeof this.get_dictionaries()[lang] == "object"){
+
+            return true;
+        }
+        else{
+            
+            return false;
+        }
     }
     
     /*

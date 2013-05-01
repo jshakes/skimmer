@@ -55,7 +55,7 @@
             //this dictionary is loadeed from a json file
             dictionaries["de-DE"] = "json/de.json";
 
-            var skimmer = new Skimmer({
+            window.skimmer = new Skimmer({
                 dictionaries: dictionaries,
                 fade: true,
                 on_load: function(lang){   console.log("loaded page with " + lang)  },
