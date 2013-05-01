@@ -17,18 +17,19 @@
         <nav class="skimr">
             <ul>
                 <li>
-                    <a href="#en_EN" data-language="en_EN">English</a>
+                    <a href="#en-US" data-language="en-US">English</a>
                 </li>
                 <li>
-                    <a href="#fr_FR" data-language="fr_FR">French</a>
+                    <a href="#fr-FR" data-language="fr-FR">French</a>
                 </li>
                 <li>
-                    <a href="#de_DE" data-language="de_DE">German</a>
+                    <a href="#de-DE" data-language="de-DE">German</a>
                 </li>
             </ul>
         </nav>
 
-        <a href="javscript:void(0)" id="hippos">boilerplates = hippos (string variable test)</a>
+        <a href="javscript:void(0)" id="hippos">boilerplates = hippos (string variable test)</a><br>
+        <a href="javscript:void(0)" id="randomize">random number (integer variable test)</a>
 
         <h1 data-translation="title">Hello!</h1>
 
@@ -45,28 +46,36 @@
             var dictionaries = [];
 
             //this dictionary is loaded using a hardcoded object
-            dictionaries["fr_FR"] = {
+            dictionaries["fr-FR"] = {
                 "title": "Bonjour!",
                 "hello-world": "Bonjour, monde! Ceci est HTML5 Boilerplate.",
                 "awesome": "Il est %d fois plus impressionnant que %s réguliers."
             };
 
             //this dictionary is loadeed from a json file
-            dictionaries["de_DE"] = "json/de.json";
+            dictionaries["de-DE"] = "json/de.json";
 
             var skimr = new Skimr({
                 dictionaries: dictionaries,
-                fade: "fade",
-                onLoad: function(){   console.log("loaded")  },
-                onStart: function(){   console.log("starting")  },
-                onComplete: function(){   console.log("complete!")  }
+                fade: true,
+                on_load: function(lang){   console.log("loaded page with " + lang)  },
+                on_start: function(lang){   console.log("starting to translate from " + lang)  },
+                on_complete: function(lang){   console.log("complete! Translated to "+ lang)  }
             });
 
             $("#hippos").on("click", function(){
 
                 $(".s").each(function(){
                     $(this).text($(this).text().replace("boilerplates", "hippos")).addClass("bold");
-                })
+                });
+            });
+
+            $("#randomize").on("click", function(){
+
+
+                $(".d").each(function(){
+                    $(this).text(Math.floor(Math.random() * 100)).addClass("bold");
+                });
             });
 
         })(jQuery);

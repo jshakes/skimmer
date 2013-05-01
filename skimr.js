@@ -5,24 +5,28 @@ Todo:
     - Detect hashchange(?)
     - Write a readme
     - Include variables in translations ✓
-    - Add animation
+    - Add animation ✓
     - Callback functions ✓
-    - Add args to callback functions
+    - Add args to callback functions ✓
+    - Translator method (by key or by string) ✓
+    - Use navigator object for default language detection ✓
 */
 
 function Skimr(properties){
 
     var defaults = {
-        default_lang: "en_EN",
-        active_lang: "en_EN",
+        native_lang: "en-US",
+        default_lang: null,
+        detect_lang: true,
         dictionaries: [],
         elements: $("[data-translation]"),
         str_class: "s",
         int_class: "d",
         fade: false,
-        onLoad: false,
-        onStart: false,
-        onComplete: false
+        on_load: null,
+        on_start: null,
+        on_complete: null,
+        active_lang: null
     };
 
     Skimr.prototype._init = function(){
@@ -42,25 +46,31 @@ function Skimr(properties){
             })(i);
         }
 
-        this.fetch_dictionaries();
-        this.create_default_dictionary();
+        this.active_lang = this.get_native_lang();
+        this.load_dictionaries();
+        this.create_native_dictionary();
         this.bind_events();
-        this.trigger(this.onLoad);
 
         //check for language hash in the url
-        var hash = window.location.hash.split("#")[1];
-        if(hash != undefined && hash != this.active_lang && this.dictionaries[hash] != undefined){
+        
 
-            this.translate_to_lang(hash);
+        if((hash = window.location.hash.split("#")[1]) != undefined && hash != this.native_lang && this.dictionaries[hash] != undefined){
+
+            var lang = hash;
+            this.translate_to_lang(lang);
         }
-    }
+        else if(this.default_lang && this.default_lang != this.native_lang){
 
-    Skimr.prototype.trigger = function(callback){
-
-        if($.isFunction(callback)){
-
-            callback.call();
+            var lang = this.get_default_lang();
+            this.translate_to_lang();   
         }
+        else if(this.detect_lang && navigator.language != undefined && navigator.language != this.native_lang){
+
+            this.translate_to_lang(navigator.language);
+        }
+
+        this.trigger(this.on_load);
+
     }
 
     Skimr.prototype.bind_events = function(){
@@ -80,7 +90,7 @@ function Skimr(properties){
         });
     }
 
-    Skimr.prototype.fetch_dictionaries = function(){
+    Skimr.prototype.load_dictionaries = function(){
 
         var that = this;
 
@@ -103,11 +113,11 @@ function Skimr(properties){
         }
     }
 
-    Skimr.prototype.create_default_dictionary = function(){
+    Skimr.prototype.create_native_dictionary = function(){
 
         var that = this;
 
-        this.dictionaries[this.default_lang] = {};
+        this.dictionaries[this.native_lang] = {};
             
         that.elements.each(function(){
 
@@ -122,7 +132,7 @@ function Skimr(properties){
                 trans = trans.replace(substr, newsubstr);
             });
 
-            that.dictionaries[that.default_lang][key] = trans;
+            that.dictionaries[that.native_lang][key] = trans;
         });
     }
 
@@ -174,7 +184,7 @@ function Skimr(properties){
 
         var that = this;
         
-        this.trigger(this.onStart);
+        this.trigger(this.on_start);
 
         this.active_lang = lang;
 
@@ -196,8 +206,22 @@ function Skimr(properties){
         });
 
         this.elements.promise().done(function(){
-            that.trigger(that.onComplete);
+            that.trigger(that.on_complete);
         });
+    }
+
+    Skimr.prototype.fetch_translation = function(key, lang){
+
+        var src_lang = lang != undefined ? lang : this.active_lang;
+        return this.dictionaries[src_lang][key]
+    }
+
+    Skimr.prototype.trigger = function(callback){
+
+        if($.isFunction(callback)){
+
+            callback.call(this, this.active_lang);
+        }
     }
 
     this._init();
