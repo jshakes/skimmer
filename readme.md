@@ -1,6 +1,6 @@
 ## About Skimmer
 
-A lightweight, client-side translation class for translating content on a web page.
+Skimmer is a lightweight, client-side translation class for translating content on a web page.
 
 Skimmer uses key:value pairs to translate content across any number of languages. Dictionaries can be loaded via JSON or JS object fixtures.
 
@@ -22,14 +22,14 @@ Dictionaries are passed into the Skimmer object as an array (`[lang_1, lang_2, e
 
 ### Add `data-translation` attributes
 
-Add `data-translation` attributes to the HTML elements you wish to translate to match them with the dictionary entries.
+Add `data-translation` attributes to match HTML elements with the dictionary entries.
 
     <p data-translation="welcome-text">Hello, how are you?</p>
     <p data-translation="goodbye-text">Goodbye and have a nice day</p>
 
 ### Instantiate a Skimmer object
 
-Call a new instance of the Skimmer class, passing in your dictionary.
+Call a new instance of the Skimmer class, passing in your dictionary array.
 
     var skimmer = new Skimmer({
         dictionary: dictionaries

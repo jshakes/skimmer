@@ -1,5 +1,5 @@
 /*
-    Skimmer.js v0.1.1 01-05-2013
+    Skimmer v0.1.1 01-05-2013
     Copyright(c) 2013 James Shakespeare - jshakespeare.com
     Docs are available at 
     Published under the WTFPL license (http://www.wtfpl.net/txt/copying/)
